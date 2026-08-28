@@ -1,0 +1,30 @@
+[
+  {
+    "_id": "6a8fce1812e55f2de9f9807f",
+    "name": "Aarav Sharma",
+    "email": "citizen@civic.org",
+    "password": "$2a$10$aFFDiSzImhx09v9vQTOmPeBVsMP0/7Q.bh4ZkfCNtcaRRk.pukKW6",
+    "role": "citizen",
+    "phone": "+91 98765 00001",
+    "address": "452 Main Street, Ward 12",
+    "department": "",
+    "departmentCode": "",
+    "createdAt": "2026-08-27T05:41:44.771Z",
+    "updatedAt": "2026-08-27T05:41:44.771Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a8fce1812e55f2de9f98082",
+    "name": "Government Department",
+    "email": "saiprofessionalnext@gmail.com",
+    "password": "$2a$10$18DYuEvJEFxIkQwM8ZtTq.vQtt59tpDdoaAFVAq9NjUrOPtgcQUOu",
+    "role": "government",
+    "phone": "",
+    "address": "",
+    "department": "Public Works Department",
+    "departmentCode": "PWD-2026",
+    "createdAt": "2026-08-27T05:41:44.874Z",
+    "updatedAt": "2026-08-27T05:41:44.874Z",
+    "__v": 0
+  }
+]

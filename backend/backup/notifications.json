@@ -1,0 +1,29 @@
+[
+  {
+    "_id": "6a8fce1812e55f2de9f9808d",
+    "recipient": "6a8fce1812e55f2de9f9807f",
+    "recipientEmail": "citizen@civic.org",
+    "targetRole": "citizen",
+    "title": "Field Officer Assigned",
+    "message": "Officer Rajesh Kumar has been assigned to your complaint #CMP-2026-000145.",
+    "unread": true,
+    "type": "assigned",
+    "complaintId": "CMP-2026-000145",
+    "createdAt": "2026-08-27T05:41:44.972Z",
+    "updatedAt": "2026-08-27T05:41:44.972Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a8fce1812e55f2de9f9808f",
+    "recipientEmail": "karan@example.com",
+    "targetRole": "citizen",
+    "title": "Status Changed to Resolved",
+    "message": "Complaint #CMP-2026-000147 has been updated to \"Resolved\".",
+    "unread": true,
+    "type": "resolved",
+    "complaintId": "CMP-2026-000147",
+    "createdAt": "2026-08-27T05:41:44.975Z",
+    "updatedAt": "2026-08-27T05:41:44.975Z",
+    "__v": 0
+  }
+]

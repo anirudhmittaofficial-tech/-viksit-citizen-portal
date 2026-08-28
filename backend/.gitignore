@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Environment Variables
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+!*.env.example
+
+# Media Uploads
+uploads/*
+!.gitkeep
+
+# Logs
+*.log
+logs/
+
+# IDE & System
+.DS_Store
+.vscode/

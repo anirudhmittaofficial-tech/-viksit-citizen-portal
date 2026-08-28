@@ -1,0 +1,255 @@
+[
+  {
+    "_id": "6a8fce1812e55f2de9f98084",
+    "complaintId": "CMP-2026-000145",
+    "title": "Severe Deep Pothole on M.G. Road",
+    "category": "Road Damage",
+    "description": "Dangerous 2-foot wide pothole near Signal 4 causing heavy traffic slowdown and risk of motorcycle accidents during rainy hours.",
+    "location": "Sector 14, M.G. Road Signal, Ward 12",
+    "formattedAddress": "Sector 14, M.G. Road Signal, Ward 12",
+    "houseNumber": "",
+    "residency": "",
+    "street": "",
+    "area": "",
+    "locality": "",
+    "city": "",
+    "district": "",
+    "state": "",
+    "pincode": "",
+    "country": "",
+    "landmark": "",
+    "coordinates": "18.5204° N, 73.8567° E",
+    "latitude": 18.5204,
+    "longitude": 73.8567,
+    "severity": "High",
+    "status": "In Progress",
+    "imageUrl": "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=600&q=80",
+    "resolutionImageUrl": "",
+    "citizen": "6a8fce1812e55f2de9f9807f",
+    "citizenName": "Aarav Sharma",
+    "citizenEmail": "citizen@civic.org",
+    "department": "Roads Department",
+    "assignedOfficer": "Rajesh Kumar (Senior Inspector)",
+    "expectedResolution": "Within 24 Hours",
+    "timeline": [
+      {
+        "status": "Submitted",
+        "date": "2026-07-28 09:15 AM",
+        "note": "Complaint logged successfully with GPS location."
+      },
+      {
+        "status": "Verified",
+        "date": "2026-07-28 10:00 AM",
+        "note": "Ward Supervisor verified site photo and urgency."
+      },
+      {
+        "status": "Assigned",
+        "date": "2026-07-28 10:45 AM",
+        "note": "Assigned to Roads Department Field Team."
+      },
+      {
+        "status": "In Progress",
+        "date": "2026-07-28 11:30 AM",
+        "note": "Inspection team dispatched under Officer Rajesh Kumar."
+      }
+    ],
+    "comments": [
+      {
+        "author": "Govt Department Officer",
+        "authorRole": "government",
+        "text": "Asphalt patching vehicle deployed to location.",
+        "date": "2026-07-28 11:35 AM",
+        "_id": "6a8fce1812e55f2de9f98085",
+        "createdAt": "2026-08-27T05:41:44.956Z",
+        "updatedAt": "2026-08-27T05:41:44.956Z"
+      }
+    ],
+    "imageVerification": {
+      "checked": false,
+      "aiGeneratedScore": 0,
+      "deepfakeScore": 0,
+      "result": null,
+      "checkedAt": null
+    },
+    "createdAt": "2026-08-27T05:41:44.956Z",
+    "updatedAt": "2026-08-27T05:41:44.956Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a8fce1812e55f2de9f98087",
+    "complaintId": "CMP-2026-000146",
+    "title": "Street Light Transformer Fault & Total Blackout",
+    "category": "Street Light",
+    "description": "Five consecutive street poles are non-functional since Sunday night. Area is extremely dark creating safety issues for residents.",
+    "location": "Green Park Housing Society Road, Ward 8",
+    "formattedAddress": "Green Park Housing Society Road, Ward 8",
+    "houseNumber": "",
+    "residency": "",
+    "street": "",
+    "area": "",
+    "locality": "",
+    "city": "",
+    "district": "",
+    "state": "",
+    "pincode": "",
+    "country": "",
+    "landmark": "",
+    "coordinates": "18.5312° N, 73.8441° E",
+    "latitude": 18.5312,
+    "longitude": 73.8441,
+    "severity": "Critical",
+    "status": "Submitted",
+    "imageUrl": "https://images.unsplash.com/photo-1509114397022-ed747cca3f65?auto=format&fit=crop&w=600&q=80",
+    "resolutionImageUrl": "",
+    "citizenName": "Priya Nambiar",
+    "citizenEmail": "priya.n@example.com",
+    "department": "Electricity Department",
+    "assignedOfficer": "Unassigned",
+    "expectedResolution": "Within 48 Hours",
+    "timeline": [
+      {
+        "status": "Submitted",
+        "date": "2026-07-29 07:45 PM",
+        "note": "Complaint auto-routed to Electricity Department."
+      }
+    ],
+    "imageVerification": {
+      "checked": false,
+      "aiGeneratedScore": 0,
+      "deepfakeScore": 0,
+      "result": null,
+      "checkedAt": null
+    },
+    "comments": [],
+    "createdAt": "2026-08-27T05:41:44.962Z",
+    "updatedAt": "2026-08-27T05:41:44.962Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a8fce1812e55f2de9f98089",
+    "complaintId": "CMP-2026-000147",
+    "title": "Garbage Dump Overflow near Community Center",
+    "category": "Garbage",
+    "description": "Municipal trash bin overflowing onto the main sidewalk. Smells hazardous and blocking pedestrian pathway.",
+    "location": "Central Market Square, Ward 15",
+    "formattedAddress": "Central Market Square, Ward 15",
+    "houseNumber": "",
+    "residency": "",
+    "street": "",
+    "area": "",
+    "locality": "",
+    "city": "",
+    "district": "",
+    "state": "",
+    "pincode": "",
+    "country": "",
+    "landmark": "",
+    "coordinates": "18.5110° N, 73.8620° E",
+    "latitude": 18.511,
+    "longitude": 73.862,
+    "severity": "Medium",
+    "status": "Resolved",
+    "imageUrl": "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=600&q=80",
+    "resolutionImageUrl": "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=600&q=80",
+    "citizenName": "Karan Patel",
+    "citizenEmail": "karan@example.com",
+    "department": "Sanitation Department",
+    "assignedOfficer": "Suresh Patil (Sanitation Lead)",
+    "expectedResolution": "Resolved",
+    "timeline": [
+      {
+        "status": "Submitted",
+        "date": "2026-07-26 08:00 AM",
+        "note": "Complaint logged."
+      },
+      {
+        "status": "Verified",
+        "date": "2026-07-26 09:00 AM",
+        "note": "Sanitation supervisor acknowledged ticket."
+      },
+      {
+        "status": "Assigned",
+        "date": "2026-07-26 09:30 AM",
+        "note": "Assigned to Ward 15 Waste Management Crew."
+      },
+      {
+        "status": "In Progress",
+        "date": "2026-07-26 10:15 AM",
+        "note": "Sanitation Truck #44 dispatched for cleanup."
+      },
+      {
+        "status": "Resolved",
+        "date": "2026-07-27 04:00 PM",
+        "note": "Waste completely cleared and area disinfected."
+      }
+    ],
+    "resolvedAt": "2026-07-27T16:00:00.000Z",
+    "imageVerification": {
+      "checked": false,
+      "aiGeneratedScore": 0,
+      "deepfakeScore": 0,
+      "result": null,
+      "checkedAt": null
+    },
+    "comments": [],
+    "createdAt": "2026-08-27T05:41:44.966Z",
+    "updatedAt": "2026-08-27T05:41:44.966Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a8fce1812e55f2de9f9808b",
+    "complaintId": "CMP-2026-000148",
+    "title": "Main Pipeline Burst & Water Leakage",
+    "category": "Water Leakage",
+    "description": "Pressurized water gushing from underground pipeline joint causing road erosion and clean water wastage.",
+    "location": "Aundh Ravet Road, Ward 4",
+    "formattedAddress": "Aundh Ravet Road, Ward 4",
+    "houseNumber": "",
+    "residency": "",
+    "street": "",
+    "area": "",
+    "locality": "",
+    "city": "",
+    "district": "",
+    "state": "",
+    "pincode": "",
+    "country": "",
+    "landmark": "",
+    "coordinates": "18.5601° N, 73.8031° E",
+    "latitude": 18.5601,
+    "longitude": 73.8031,
+    "severity": "High",
+    "status": "Verified",
+    "imageUrl": "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=600&q=80",
+    "resolutionImageUrl": "",
+    "citizen": "6a8fce1812e55f2de9f9807f",
+    "citizenName": "Aarav Sharma",
+    "citizenEmail": "citizen@civic.org",
+    "department": "Water Department",
+    "assignedOfficer": "Vikram Singh (Hydraulics Tech)",
+    "expectedResolution": "Within 24 Hours",
+    "timeline": [
+      {
+        "status": "Submitted",
+        "date": "2026-07-29 11:20 AM",
+        "note": "Complaint logged."
+      },
+      {
+        "status": "Verified",
+        "date": "2026-07-29 12:05 PM",
+        "note": "Water Department inspector confirmed valve replacement required."
+      }
+    ],
+    "imageVerification": {
+      "checked": false,
+      "aiGeneratedScore": 0,
+      "deepfakeScore": 0,
+      "result": null,
+      "checkedAt": null
+    },
+    "comments": [],
+    "createdAt": "2026-08-27T05:41:44.970Z",
+    "updatedAt": "2026-08-27T05:41:44.970Z",
+    "__v": 0
+  }
+]

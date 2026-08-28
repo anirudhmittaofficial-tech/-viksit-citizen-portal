@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+
+# Environment variables (NEVER commit these)
+.env
+.env.local
+.env.production
+
+# Build outputs
+dist/
+build/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor folders
+.vscode/
+.idea/
+
+# Uploaded files (stored on server, not in git)
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Temp scripts
+backend/scripts/check-schema.js
+backend/scripts/check-user.js
+backend/scripts/test-officers-query.js
