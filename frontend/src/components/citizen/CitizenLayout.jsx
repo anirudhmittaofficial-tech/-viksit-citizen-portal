@@ -19,14 +19,26 @@ import { useComplaints } from '../../context/ComplaintContext';
 
 export default function CitizenLayout() {
   const { user, logout } = useAuth();
-  const { notifications } = useComplaints();
+  const { notifications, markAllNotificationsRead } = useComplaints();
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isPageTransitioning, setIsPageTransitioning] = useState(false);
 
-  const unreadCount = notifications.filter(n => n.unread).length;
+  const isNotificationsPage = location.pathname === '/citizen/notifications';
+
+  // Automatically mark notifications as read when the user is on the notifications page
+  React.useEffect(() => {
+    if (isNotificationsPage) {
+      markAllNotificationsRead();
+    }
+  }, [isNotificationsPage]);
+
+  // When on notifications page, badge disappears instantly (count = 0)
+  const unreadCount = isNotificationsPage
+    ? 0
+    : notifications.filter(n => n.unread === true || n.isRead === false).length;
 
   // Trigger smooth loading indicator whenever the route/section changes
   React.useEffect(() => {

@@ -219,15 +219,22 @@ export function ComplaintProvider({ children }) {
   };
 
   const markAllNotificationsRead = async () => {
+    // Optimistically and synchronously mark all notifications as read in state & localStorage
+    setNotifications(prev => prev.map(n => ({ ...n, unread: false, isRead: true, read: true })));
+    try {
+      const saved = localStorage.getItem(NOTIFS_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved).map(n => ({ ...n, unread: false, isRead: true, read: true }));
+        localStorage.setItem(NOTIFS_KEY, JSON.stringify(parsed));
+      }
+    } catch {
+      // ignore
+    }
     try {
       await markAllNotificationsReadApi();
-      await refreshNotifications();
-      return;
     } catch (e) {
-      // Fallback
+      console.warn('API mark all read fallback:', e.message);
     }
-    const updated = notifications.map(n => ({ ...n, unread: false }));
-    saveNotifsLocal(updated);
   };
 
   const getDepartmentForCategory = (category) => {
