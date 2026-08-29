@@ -46,8 +46,12 @@ export function AuthProvider({ children }) {
         setLoading(true);
         try {
           await handleGoogleLogin(session.access_token);
-          // Sign out of Supabase immediately to clear the client-side session
-          await supabase.auth.signOut();
+          // Clear the URL hash
+          if (window.location.hash) {
+            window.history.replaceState(null, '', window.location.pathname);
+          }
+          // Redirect to dashboard
+          window.location.href = '/citizen/dashboard';
         } catch (err) {
           console.error('Google OAuth exchange failed:', err.message);
         } finally {
