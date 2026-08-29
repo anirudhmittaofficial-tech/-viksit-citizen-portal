@@ -31,10 +31,21 @@ export default function CitizenDashboard() {
   const [trackError, setTrackError] = useState('');
   const [activeFilter, setActiveFilter] = useState('All'); // 'All' | 'Submitted' | 'In Progress' | 'Resolved'
 
-  // Dynamic complaint counts from actual backend state
-  const submittedCount = complaints.filter(c => c.status === 'Submitted' || c.status === 'Verified').length;
-  const inProgressCount = complaints.filter(c => c.status === 'In Progress' || c.status === 'Assigned' || c.status === 'Pending').length;
-  const resolvedCount = complaints.filter(c => c.status === 'Resolved' || c.status === 'Closed').length;
+  // User-specific complaints for dashboard metrics
+  const userEmail = user?.email?.toLowerCase();
+  const userId = String(user?.id || user?._id || '');
+
+  const myComplaintsList = complaints.filter(item => {
+    if (!user) return false;
+    const itemEmail = (item.citizenEmail || item.citizen_email || item.email || '').toLowerCase();
+    const itemCitizen = String(item.citizen || item.citizenId || item.citizen_id || item.userId || '');
+    return (userEmail && itemEmail === userEmail) || (userId && itemCitizen === userId);
+  });
+
+  // Dynamic complaint counts from user's personal complaints
+  const submittedCount = myComplaintsList.filter(c => c.status === 'Submitted' || c.status === 'Verified').length;
+  const inProgressCount = myComplaintsList.filter(c => c.status === 'In Progress' || c.status === 'Assigned' || c.status === 'Pending').length;
+  const resolvedCount = myComplaintsList.filter(c => c.status === 'Resolved' || c.status === 'Closed').length;
 
   // Filter complaints based on active counter card selection
   const filteredRecentComplaints = complaints.filter(c => {

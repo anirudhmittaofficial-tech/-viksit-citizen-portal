@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Search, Download, Filter, Eye, Plus, ArrowUpDown, FileText } from 'lucide-react';
 import { useComplaints } from '../../context/ComplaintContext';
+import { useAuth } from '../../context/AuthContext';
 import { Link } from 'react-router-dom';
 import StatusBadge from '../../components/common/StatusBadge';
 import ComplaintDetail from './ComplaintDetail';
@@ -9,14 +10,26 @@ import SkeletonLoader from '../../components/common/SkeletonLoader';
 
 export default function MyComplaints() {
   const { complaints, loading, addComment } = useComplaints();
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [categoryFilter, setCategoryFilter] = useState('All');
   const [sortOrder, setSortOrder] = useState('newest'); // 'newest' | 'oldest'
   const [selectedComplaint, setSelectedComplaint] = useState(null);
 
-  // Filter complaints
-  const filteredComplaints = complaints.filter(item => {
+  // Filter only complaints submitted by the currently logged in citizen
+  const userEmail = user?.email?.toLowerCase();
+  const userId = String(user?.id || user?._id || '');
+
+  const myOnlyComplaints = complaints.filter(item => {
+    if (!user) return false;
+    const itemEmail = (item.citizenEmail || item.citizen_email || item.email || '').toLowerCase();
+    const itemCitizen = String(item.citizen || item.citizenId || item.citizen_id || item.userId || '');
+    return (userEmail && itemEmail === userEmail) || (userId && itemCitizen === userId);
+  });
+
+  // Apply search and filter on user's own complaints
+  const filteredComplaints = myOnlyComplaints.filter(item => {
     const matchesSearch =
       (item.complaintId || item.id || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
       (item.title || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
