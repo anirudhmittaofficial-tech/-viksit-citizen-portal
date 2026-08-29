@@ -32,16 +32,22 @@ export default function CitizenDashboard() {
   const [isTracking, setIsTracking] = useState(false);
   const [activeFilter, setActiveFilter] = useState('All'); // 'All' | 'Submitted' | 'In Progress' | 'Resolved'
   const [locationViewScope, setLocationViewScope] = useState('nearby'); // 'nearby' | 'all'
+  
+  // Current active location (defaulting to Pocharam or saved / detected location)
+  const [currentLocation, setCurrentLocation] = useState(() => {
+    return localStorage.getItem('citizen_current_location') || 'Pocharam';
+  });
+  const [isDetectingLocation, setIsDetectingLocation] = useState(false);
 
   // User-specific complaints for dashboard metrics
   const userEmail = user?.email?.toLowerCase();
   const userId = String(user?.id || user?._id || '');
-  const userAddressRaw = (user?.address || '').toLowerCase().trim();
 
-  // Extract meaningful address keywords (e.g., "shadnagar", "pocharam", "hyderabad")
-  const userAddressTokens = userAddressRaw
+  // Extract meaningful tokens from current location (e.g., "pocharam", "ghatkesar")
+  const activeLocationTokens = (currentLocation || '')
+    .toLowerCase()
     .split(/[\s,.-]+/)
-    .filter(token => token.length >= 3 && !['road', 'street', 'near', 'flat', 'house', 'plot', 'lane', 'no', 'h.no'].includes(token));
+    .filter(token => token.length >= 3 && !['road', 'street', 'near', 'flat', 'house', 'plot', 'lane', 'mandal', 'telangana', 'india'].includes(token));
 
   const myComplaintsList = complaints.filter(item => {
     if (!user) return false;
@@ -55,7 +61,7 @@ export default function CitizenDashboard() {
   const inProgressCount = myComplaintsList.filter(c => c.status === 'In Progress' || c.status === 'Assigned' || c.status === 'Pending').length;
   const resolvedCount = myComplaintsList.filter(c => c.status === 'Resolved' || c.status === 'Closed').length;
 
-  // Filter complaints based on user's location + status filter
+  // Strict location-based filtering for Recent Complaints
   const filteredRecentComplaints = complaints.filter(c => {
     // 1. Status Filter
     const matchesStatus = (
@@ -66,36 +72,58 @@ export default function CitizenDashboard() {
     );
     if (!matchesStatus) return false;
 
-    // 2. Location Filter (if scope is 'nearby')
+    // 2. Strict Location Filter (when scope is 'nearby')
     if (locationViewScope === 'nearby') {
-      const itemEmail = (c.citizenEmail || c.citizen_email || c.email || '').toLowerCase();
-      const itemCitizen = String(c.citizen || c.citizenId || c.citizen_id || c.userId || '');
-      const isMyOwn = (userEmail && itemEmail === userEmail) || (userId && itemCitizen === userId);
-      
-      // Always show user's own issues
-      if (isMyOwn) return true;
+      const compLocationText = (
+        (c.location || '') + ' ' +
+        (c.formattedAddress || '') + ' ' +
+        (c.area || '') + ' ' +
+        (c.locality || '') + ' ' +
+        (c.city || '') + ' ' +
+        (c.district || '') + ' ' +
+        (c.landmark || '')
+      ).toLowerCase();
 
-      // Match against user address keywords
-      if (userAddressTokens.length > 0) {
-        const compLocationText = (
-          (c.location || '') + ' ' +
-          (c.formattedAddress || '') + ' ' +
-          (c.area || '') + ' ' +
-          (c.locality || '') + ' ' +
-          (c.city || '') + ' ' +
-          (c.district || '') + ' ' +
-          (c.landmark || '')
-        ).toLowerCase();
-
-        return userAddressTokens.some(token => compLocationText.includes(token));
+      // Only show complaints that are strictly within the user's active current location (e.g. Pocharam)
+      if (activeLocationTokens.length > 0) {
+        return activeLocationTokens.some(token => compLocationText.includes(token));
       }
-
-      // If user has no address set, show their own complaints by default
-      return isMyOwn;
+      return true;
     }
 
     return true;
   });
+
+  // Detect Live GPS Location
+  const handleDetectLiveLocation = () => {
+    if (!navigator.geolocation) {
+      alert('Geolocation is not supported by your browser.');
+      return;
+    }
+    setIsDetectingLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude, longitude } = pos.coords;
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+          const data = await res.json();
+          const areaName = data.address?.suburb || data.address?.neighbourhood || data.address?.residential || data.address?.village || data.address?.town || data.address?.city || 'Pocharam';
+          setCurrentLocation(areaName);
+          localStorage.setItem('citizen_current_location', areaName);
+        } catch {
+          setCurrentLocation('Pocharam');
+          localStorage.setItem('citizen_current_location', 'Pocharam');
+        } finally {
+          setIsDetectingLocation(false);
+        }
+      },
+      () => {
+        setIsDetectingLocation(false);
+        setCurrentLocation('Pocharam');
+      },
+      { timeout: 8000, enableHighAccuracy: true }
+    );
+  };
 
   // Track complaint handler with smooth loading
   const handleTrackSubmit = (e) => {
@@ -419,14 +447,32 @@ export default function CitizenDashboard() {
               <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>
                 {locationViewScope === 'nearby' ? 'Complaints in Your Location' : 'All Recent Complaints'}
               </h2>
-              {user?.address && (
-                <span style={{ backgroundColor: '#f0fdf4', color: '#166534', border: '1px solid #bbf7d0', padding: '0.15rem 0.55rem', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 700 }}>
-                  📍 {user.address}
-                </span>
+              {locationViewScope === 'nearby' && (
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', backgroundColor: '#f0fdf4', color: '#166534', border: '1px solid #bbf7d0', padding: '0.15rem 0.6rem', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 700 }}>
+                  <span>📍 {currentLocation}</span>
+                  <button
+                    type="button"
+                    onClick={handleDetectLiveLocation}
+                    disabled={isDetectingLocation}
+                    title="Auto-detect via GPS"
+                    style={{
+                      border: 'none',
+                      background: 'none',
+                      color: '#047857',
+                      fontSize: '0.7rem',
+                      cursor: 'pointer',
+                      textDecoration: 'underline',
+                      padding: 0,
+                      fontWeight: 800
+                    }}
+                  >
+                    {isDetectingLocation ? '(Detecting...)' : '(Live GPS)'}
+                  </button>
+                </div>
               )}
             </div>
             <p style={{ color: '#64748b', fontSize: '0.85rem', margin: '0.2rem 0 0 0' }}>
-              {locationViewScope === 'nearby' ? 'Showing issues matching your residential ward & registered location.' : 'Showing all municipal issues.'}
+              {locationViewScope === 'nearby' ? `Only showing civic issues reported in ${currentLocation}.` : 'Showing all municipal issues across all wards.'}
             </p>
           </div>
 
@@ -448,7 +494,7 @@ export default function CitizenDashboard() {
                   boxShadow: locationViewScope === 'nearby' ? '0 1px 2px rgba(0,0,0,0.06)' : 'none'
                 }}
               >
-                📍 My Location
+                📍 {currentLocation}
               </button>
               <button
                 type="button"
@@ -478,11 +524,11 @@ export default function CitizenDashboard() {
         {filteredRecentComplaints.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '2.5rem 1rem', color: '#64748b', backgroundColor: '#f8fafc', borderRadius: '0.5rem', border: '1px dashed #cbd5e1' }}>
             <h3 style={{ margin: '0 0 0.5rem 0', fontWeight: 800, color: '#0f172a' }}>
-              {locationViewScope === 'nearby' ? `No other complaints in ${user?.address || 'your location'} yet` : 'No complaints yet'}
+              {locationViewScope === 'nearby' ? `No issues currently reported in ${currentLocation}` : 'No complaints yet'}
             </h3>
-            <p style={{ margin: '0 0 1.25rem 0' }}>You can report a new issue or switch to "All Areas" to view city-wide complaints.</p>
+            <p style={{ margin: '0 0 1.25rem 0' }}>You can report a new issue in {currentLocation} or switch to "All Areas" to browse city-wide complaints.</p>
             <Link to="/citizen/report-issue" className="btn btn-primary-citizen" style={{ fontSize: '0.85rem' }}>
-              📍 Report Issue in My Location
+              📍 Report Issue in {currentLocation}
             </Link>
           </div>
         ) : (
