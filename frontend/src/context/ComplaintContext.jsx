@@ -45,19 +45,36 @@ export function ComplaintProvider({ children }) {
   }, []);
 
   const refreshNotifications = useCallback(async () => {
+    const lastReadTs = Number(localStorage.getItem('civic_notifications_last_read_ts') || 0);
+
     try {
       const data = await fetchNotificationsApi(user?.email);
       if (data && data.notifications) {
-        setNotifications(data.notifications);
-        localStorage.setItem(NOTIFS_KEY, JSON.stringify(data.notifications));
+        const mapped = data.notifications.map(n => {
+          const createdTime = new Date(n.createdAt || n.timestamp || 0).getTime();
+          const isRead = (lastReadTs > 0 && createdTime <= lastReadTs) || n.unread === false || n.isRead === true || n.read === true;
+          return { ...n, unread: !isRead, isRead, read: isRead };
+        });
+        setNotifications(mapped);
+        localStorage.setItem(NOTIFS_KEY, JSON.stringify(mapped));
       }
     } catch (err) {
       console.warn('API error fetching notifications, using local state:', err.message);
       const saved = localStorage.getItem(NOTIFS_KEY);
       if (saved) {
-        setNotifications(JSON.parse(saved));
+        const parsed = JSON.parse(saved).map(n => {
+          const createdTime = new Date(n.createdAt || n.timestamp || 0).getTime();
+          const isRead = (lastReadTs > 0 && createdTime <= lastReadTs) || n.unread === false || n.isRead === true || n.read === true;
+          return { ...n, unread: !isRead, isRead, read: isRead };
+        });
+        setNotifications(parsed);
       } else {
-        setNotifications(NOTIFICATIONS_SEED);
+        const seeded = NOTIFICATIONS_SEED.map(n => {
+          const createdTime = new Date(n.createdAt || n.timestamp || 0).getTime();
+          const isRead = (lastReadTs > 0 && createdTime <= lastReadTs) || n.unread === false || n.isRead === true || n.read === true;
+          return { ...n, unread: !isRead, isRead, read: isRead };
+        });
+        setNotifications(seeded);
       }
     }
   }, [user]);
@@ -219,6 +236,10 @@ export function ComplaintProvider({ children }) {
   };
 
   const markAllNotificationsRead = async () => {
+    // Record timestamp so past notifications are permanently marked read
+    const now = Date.now();
+    localStorage.setItem('civic_notifications_last_read_ts', String(now));
+
     // Optimistically and synchronously mark all notifications as read in state & localStorage
     setNotifications(prev => prev.map(n => ({ ...n, unread: false, isRead: true, read: true })));
     try {

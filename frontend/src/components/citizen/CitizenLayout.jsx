@@ -35,10 +35,16 @@ export default function CitizenLayout() {
     }
   }, [isNotificationsPage]);
 
-  // When on notifications page, badge disappears instantly (count = 0)
+  // When on notifications page, badge disappears instantly (count = 0).
+  // When on other pages, ignore any notification created before last read timestamp.
   const unreadCount = isNotificationsPage
     ? 0
-    : notifications.filter(n => n.unread === true || n.isRead === false).length;
+    : notifications.filter(n => {
+        const lastReadTs = Number(localStorage.getItem('civic_notifications_last_read_ts') || 0);
+        const createdTime = new Date(n.createdAt || n.timestamp || 0).getTime();
+        if (lastReadTs > 0 && createdTime > 0 && createdTime <= lastReadTs) return false;
+        return n.unread === true && n.isRead !== true && n.read !== true;
+      }).length;
 
   // Trigger smooth loading indicator whenever the route/section changes
   React.useEffect(() => {
