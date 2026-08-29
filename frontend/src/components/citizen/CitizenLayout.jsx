@@ -21,10 +21,21 @@ export default function CitizenLayout() {
   const { user, logout } = useAuth();
   const { notifications } = useComplaints();
   const navigate = useNavigate();
+  const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [isPageTransitioning, setIsPageTransitioning] = useState(false);
 
   const unreadCount = notifications.filter(n => n.unread).length;
+
+  // Trigger smooth loading indicator whenever the route/section changes
+  React.useEffect(() => {
+    setIsPageTransitioning(true);
+    const timer = setTimeout(() => {
+      setIsPageTransitioning(false);
+    }, 280);
+    return () => clearTimeout(timer);
+  }, [location.pathname]);
 
   const sidebarItems = [
     { label: 'Dashboard', path: '/citizen/dashboard', icon: LayoutDashboard },
@@ -39,7 +50,21 @@ export default function CitizenLayout() {
   };
 
   return (
-    <div className="layout-root" style={{ minHeight: '100vh', backgroundColor: '#f8fafc', display: 'flex' }}>
+    <div className="layout-root" style={{ minHeight: '100vh', backgroundColor: '#f8fafc', display: 'flex', position: 'relative' }}>
+      
+      {/* Top Global Navigation Loading Bar */}
+      {isPageTransitioning && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '3px',
+          background: 'linear-gradient(90deg, #0f766e, #2E8B57, #38bdf8)',
+          zIndex: 9999,
+          animation: 'topBarProgress 0.3s ease-in-out'
+        }} />
+      )}
       
       {/* 1. Left Sidebar (Desktop Only) */}
       <aside className="desktop-sidebar" style={{

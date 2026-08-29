@@ -29,6 +29,7 @@ export default function CitizenDashboard() {
   const [trackIdInput, setTrackIdInput] = useState('');
   const [trackedResult, setTrackedResult] = useState(null);
   const [trackError, setTrackError] = useState('');
+  const [isTracking, setIsTracking] = useState(false);
   const [activeFilter, setActiveFilter] = useState('All'); // 'All' | 'Submitted' | 'In Progress' | 'Resolved'
   const [locationViewScope, setLocationViewScope] = useState('nearby'); // 'nearby' | 'all'
 
@@ -96,7 +97,7 @@ export default function CitizenDashboard() {
     return true;
   });
 
-  // Track complaint handler
+  // Track complaint handler with smooth loading
   const handleTrackSubmit = (e) => {
     e.preventDefault();
     if (!trackIdInput || !trackIdInput.trim()) {
@@ -105,21 +106,28 @@ export default function CitizenDashboard() {
       return;
     }
 
-    const cleanSearch = trackIdInput.trim().toLowerCase();
-    const found = complaints.find(c => 
-      (c.complaintId && c.complaintId.toLowerCase() === cleanSearch) ||
-      (c.id && c.id.toLowerCase() === cleanSearch) ||
-      (c._id && c._id.toLowerCase() === cleanSearch) ||
-      (c.complaintId && c.complaintId.toLowerCase().includes(cleanSearch))
-    );
+    setIsTracking(true);
+    setTrackError('');
+    setTrackedResult(null);
 
-    if (found) {
-      setTrackedResult(found);
-      setTrackError('');
-    } else {
-      setTrackedResult(null);
-      setTrackError(`No complaint found with ID "${trackIdInput.trim()}". Please verify your Complaint ID.`);
-    }
+    setTimeout(() => {
+      const cleanSearch = trackIdInput.trim().toLowerCase();
+      const found = complaints.find(c => 
+        (c.complaintId && c.complaintId.toLowerCase() === cleanSearch) ||
+        (c.id && c.id.toLowerCase() === cleanSearch) ||
+        (c._id && c._id.toLowerCase() === cleanSearch) ||
+        (c.complaintId && c.complaintId.toLowerCase().includes(cleanSearch))
+      );
+
+      if (found) {
+        setTrackedResult(found);
+        setTrackError('');
+      } else {
+        setTrackedResult(null);
+        setTrackError(`No complaint found with ID "${trackIdInput.trim()}". Please verify your Complaint ID.`);
+      }
+      setIsTracking(false);
+    }, 350);
   };
 
   const scrollToTrackSection = () => {
@@ -325,10 +333,34 @@ export default function CitizenDashboard() {
           />
           <button
             type="submit"
+            disabled={isTracking}
             className="btn btn-primary-citizen"
-            style={{ padding: '0.75rem 1.5rem', fontSize: '0.95rem', fontWeight: 700 }}
+            style={{
+              padding: '0.75rem 1.5rem',
+              fontSize: '0.95rem',
+              fontWeight: 700,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              opacity: isTracking ? 0.8 : 1,
+              cursor: isTracking ? 'wait' : 'pointer'
+            }}
           >
-            Track Complaint
+            {isTracking ? (
+              <>
+                <div style={{
+                  width: '16px',
+                  height: '16px',
+                  border: '2px solid rgba(255,255,255,0.3)',
+                  borderTopColor: '#ffffff',
+                  borderRadius: '50%',
+                  animation: 'spin 0.8s linear infinite'
+                }} />
+                <span>Locating Ticket...</span>
+              </>
+            ) : (
+              <span>Track Complaint</span>
+            )}
           </button>
         </form>
 

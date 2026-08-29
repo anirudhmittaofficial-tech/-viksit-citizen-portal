@@ -7,55 +7,66 @@ const AuthContext = createContext();
 const SESSION_KEY = 'civic_session';
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [role, setRole] = useState(null); // 'citizen' | 'admin' | null
-  const [token, setToken] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  // Restore and validate session on app start
-  useEffect(() => {
-    const validateSession = async () => {
-      try {
-        const savedSession = localStorage.getItem(SESSION_KEY);
-        if (savedSession) {
-          const parsed = JSON.parse(savedSession);
-          if (parsed.token) {
-            // Validate the token against the backend
-            const res = await getMeApi();
-            setUser(res.user);
-            setRole(parsed.role);
-            setToken(parsed.token);
-          } else {
-            throw new Error('No token found in saved session');
-          }
+  // Read session synchronously on initialization to eliminate loading flicker
+  const getInitialSession = () => {
+    try {
+      const saved = localStorage.getItem(SESSION_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.token && parsed.user) {
+          return parsed;
         }
-      } catch (e) {
-        console.error('Session validation failed:', e.message);
-        localStorage.removeItem(SESSION_KEY);
-      } finally {
-        setLoading(false);
       }
-    };
-    validateSession();
+    } catch {
+      // ignore
+    }
+    return null;
+  };
+
+  const initialSession = getInitialSession();
+
+  const [user, setUser] = useState(initialSession ? initialSession.user : null);
+  const [role, setRole] = useState(initialSession ? initialSession.role : null); // 'citizen' | 'admin' | null
+  const [token, setToken] = useState(initialSession ? initialSession.token : null);
+  const [loading, setLoading] = useState(false);
+
+  // Background token freshness check (non-blocking)
+  useEffect(() => {
+    if (token) {
+      getMeApi()
+        .then((res) => {
+          if (res?.user) {
+            setUser(res.user);
+          }
+        })
+        .catch((e) => {
+          // If token is explicitly unauthorized (401), clear session
+          if (e?.message?.includes('401') || e?.response?.status === 401) {
+            console.warn('Session expired:', e.message);
+            logout();
+          }
+        });
+    }
   }, []);
 
   // Listen for Supabase OAuth redirects on mount
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session) {
-        setLoading(true);
-        try {
-          await handleGoogleLogin(session.access_token);
-          // Clear the URL hash
-          if (window.location.hash) {
-            window.history.replaceState(null, '', window.location.pathname);
+      if (event === 'SIGNED_IN' && session?.access_token) {
+        const currentSession = localStorage.getItem(SESSION_KEY);
+        // Only trigger exchange if citizen session is not already established
+        if (!currentSession || !JSON.parse(currentSession)?.token) {
+          setLoading(true);
+          try {
+            await handleGoogleLogin(session.access_token);
+            if (window.location.hash) {
+              window.history.replaceState(null, '', window.location.pathname);
+            }
+          } catch (err) {
+            console.error('Google OAuth exchange failed:', err.message);
+          } finally {
+            setLoading(false);
           }
-          // Redirect to dashboard
-          window.location.href = '/citizen/dashboard';
-        } catch (err) {
-          console.error('Google OAuth exchange failed:', err.message);
-        } finally {
-          setLoading(false);
         }
       }
     });
