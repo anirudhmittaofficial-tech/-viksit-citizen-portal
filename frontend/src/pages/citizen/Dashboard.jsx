@@ -30,10 +30,17 @@ export default function CitizenDashboard() {
   const [trackedResult, setTrackedResult] = useState(null);
   const [trackError, setTrackError] = useState('');
   const [activeFilter, setActiveFilter] = useState('All'); // 'All' | 'Submitted' | 'In Progress' | 'Resolved'
+  const [locationViewScope, setLocationViewScope] = useState('nearby'); // 'nearby' | 'all'
 
   // User-specific complaints for dashboard metrics
   const userEmail = user?.email?.toLowerCase();
   const userId = String(user?.id || user?._id || '');
+  const userAddressRaw = (user?.address || '').toLowerCase().trim();
+
+  // Extract meaningful address keywords (e.g., "shadnagar", "pocharam", "hyderabad")
+  const userAddressTokens = userAddressRaw
+    .split(/[\s,.-]+/)
+    .filter(token => token.length >= 3 && !['road', 'street', 'near', 'flat', 'house', 'plot', 'lane', 'no', 'h.no'].includes(token));
 
   const myComplaintsList = complaints.filter(item => {
     if (!user) return false;
@@ -47,11 +54,45 @@ export default function CitizenDashboard() {
   const inProgressCount = myComplaintsList.filter(c => c.status === 'In Progress' || c.status === 'Assigned' || c.status === 'Pending').length;
   const resolvedCount = myComplaintsList.filter(c => c.status === 'Resolved' || c.status === 'Closed').length;
 
-  // Filter complaints based on active counter card selection
+  // Filter complaints based on user's location + status filter
   const filteredRecentComplaints = complaints.filter(c => {
-    if (activeFilter === 'Submitted') return c.status === 'Submitted' || c.status === 'Verified';
-    if (activeFilter === 'In Progress') return c.status === 'In Progress' || c.status === 'Assigned' || c.status === 'Pending';
-    if (activeFilter === 'Resolved') return c.status === 'Resolved' || c.status === 'Closed';
+    // 1. Status Filter
+    const matchesStatus = (
+      activeFilter === 'All' ||
+      (activeFilter === 'Submitted' && (c.status === 'Submitted' || c.status === 'Verified')) ||
+      (activeFilter === 'In Progress' && (c.status === 'In Progress' || c.status === 'Assigned' || c.status === 'Pending')) ||
+      (activeFilter === 'Resolved' && (c.status === 'Resolved' || c.status === 'Closed'))
+    );
+    if (!matchesStatus) return false;
+
+    // 2. Location Filter (if scope is 'nearby')
+    if (locationViewScope === 'nearby') {
+      const itemEmail = (c.citizenEmail || c.citizen_email || c.email || '').toLowerCase();
+      const itemCitizen = String(c.citizen || c.citizenId || c.citizen_id || c.userId || '');
+      const isMyOwn = (userEmail && itemEmail === userEmail) || (userId && itemCitizen === userId);
+      
+      // Always show user's own issues
+      if (isMyOwn) return true;
+
+      // Match against user address keywords
+      if (userAddressTokens.length > 0) {
+        const compLocationText = (
+          (c.location || '') + ' ' +
+          (c.formattedAddress || '') + ' ' +
+          (c.area || '') + ' ' +
+          (c.locality || '') + ' ' +
+          (c.city || '') + ' ' +
+          (c.district || '') + ' ' +
+          (c.landmark || '')
+        ).toLowerCase();
+
+        return userAddressTokens.some(token => compLocationText.includes(token));
+      }
+
+      // If user has no address set, show their own complaints by default
+      return isMyOwn;
+    }
+
     return true;
   });
 
@@ -340,21 +381,76 @@ export default function CitizenDashboard() {
 
       {/* 6. RECENT COMPLAINTS */}
       <div className="card" style={{ padding: '1.75rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>
-            Recent Complaints
-          </h2>
-          <Link to="/citizen/my-complaints" style={{ fontSize: '0.875rem', fontWeight: 700, color: '#0F4C81', textDecoration: 'none' }}>
-            View All Complaints →
-          </Link>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>
+                {locationViewScope === 'nearby' ? 'Complaints in Your Location' : 'All Recent Complaints'}
+              </h2>
+              {user?.address && (
+                <span style={{ backgroundColor: '#f0fdf4', color: '#166534', border: '1px solid #bbf7d0', padding: '0.15rem 0.55rem', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 700 }}>
+                  📍 {user.address}
+                </span>
+              )}
+            </div>
+            <p style={{ color: '#64748b', fontSize: '0.85rem', margin: '0.2rem 0 0 0' }}>
+              {locationViewScope === 'nearby' ? 'Showing issues matching your residential ward & registered location.' : 'Showing all municipal issues.'}
+            </p>
+          </div>
+
+          {/* Scope Toggle & View All Link */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+            <div style={{ display: 'flex', backgroundColor: '#f1f5f9', padding: '0.2rem', borderRadius: '0.5rem' }}>
+              <button
+                type="button"
+                onClick={() => setLocationViewScope('nearby')}
+                style={{
+                  padding: '0.35rem 0.65rem',
+                  fontSize: '0.78rem',
+                  fontWeight: locationViewScope === 'nearby' ? 800 : 600,
+                  backgroundColor: locationViewScope === 'nearby' ? '#ffffff' : 'transparent',
+                  color: locationViewScope === 'nearby' ? '#0f766e' : '#64748b',
+                  border: 'none',
+                  borderRadius: '0.4rem',
+                  cursor: 'pointer',
+                  boxShadow: locationViewScope === 'nearby' ? '0 1px 2px rgba(0,0,0,0.06)' : 'none'
+                }}
+              >
+                📍 My Location
+              </button>
+              <button
+                type="button"
+                onClick={() => setLocationViewScope('all')}
+                style={{
+                  padding: '0.35rem 0.65rem',
+                  fontSize: '0.78rem',
+                  fontWeight: locationViewScope === 'all' ? 800 : 600,
+                  backgroundColor: locationViewScope === 'all' ? '#ffffff' : 'transparent',
+                  color: locationViewScope === 'all' ? '#0f766e' : '#64748b',
+                  border: 'none',
+                  borderRadius: '0.4rem',
+                  cursor: 'pointer',
+                  boxShadow: locationViewScope === 'all' ? '0 1px 2px rgba(0,0,0,0.06)' : 'none'
+                }}
+              >
+                🌐 All Areas
+              </button>
+            </div>
+
+            <Link to="/citizen/my-complaints" style={{ fontSize: '0.875rem', fontWeight: 700, color: '#0F4C81', textDecoration: 'none', whiteSpace: 'nowrap' }}>
+              My Complaints →
+            </Link>
+          </div>
         </div>
 
         {filteredRecentComplaints.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '2.5rem 1rem', color: '#64748b', backgroundColor: '#f8fafc', borderRadius: '0.5rem', border: '1px dashed #cbd5e1' }}>
-            <h3 style={{ margin: '0 0 0.5rem 0', fontWeight: 800, color: '#0f172a' }}>No complaints yet</h3>
-            <p style={{ margin: '0 0 1.25rem 0' }}>Complaints submitted by citizens will appear here.</p>
+            <h3 style={{ margin: '0 0 0.5rem 0', fontWeight: 800, color: '#0f172a' }}>
+              {locationViewScope === 'nearby' ? `No other complaints in ${user?.address || 'your location'} yet` : 'No complaints yet'}
+            </h3>
+            <p style={{ margin: '0 0 1.25rem 0' }}>You can report a new issue or switch to "All Areas" to view city-wide complaints.</p>
             <Link to="/citizen/report-issue" className="btn btn-primary-citizen" style={{ fontSize: '0.85rem' }}>
-              📍 Report New Issue
+              📍 Report Issue in My Location
             </Link>
           </div>
         ) : (
