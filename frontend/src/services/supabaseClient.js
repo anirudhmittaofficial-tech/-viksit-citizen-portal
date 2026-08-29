@@ -1,13 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://eefgoogiwzcglrioenvo.supabase.co';
+const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_5LbXxpFBeBdIkwvZTAeBiw_X9e-ExW0';
 
-if (!supabaseUrl || !supabaseKey || supabaseKey.includes('PASTE_YOUR_FULL')) {
-  console.warn('⚠️ Supabase URL or Publishable Key is missing from frontend/.env');
-}
-
-export const supabase = createClient(
-  supabaseUrl || 'https://placeholder.supabase.co',
-  supabaseKey && !supabaseKey.includes('PASTE_YOUR_FULL') ? supabaseKey : 'placeholder'
-);
+export const supabase = createClient(supabaseUrl, supabaseKey);
