@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { User, Mail, Phone, MapPin, Shield, Save, Key, CheckCircle2 } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
+import { User, Mail, Phone, MapPin, Shield, Save, Key, CheckCircle2, ArrowLeft, LogOut } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useComplaints } from '../../context/ComplaintContext';
 
 export default function Profile() {
-  const { user, updateProfile } = useAuth();
+  const { user, updateProfile, logout } = useAuth();
   const { complaints } = useComplaints();
+  const navigate = useNavigate();
 
   const [profileData, setProfileData] = useState({
     name: user?.name || '',
@@ -56,12 +58,50 @@ export default function Profile() {
     }
   };
 
-  const myCount = complaints.length;
-  const resolvedCount = complaints.filter(c => c.status === 'Resolved' || c.status === 'Closed').length;
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
+  // User-specific stats
+  const userEmail = user?.email?.toLowerCase();
+  const userId = String(user?.id || user?._id || '');
+  const myUserComplaints = complaints.filter(item => {
+    if (!user) return false;
+    const itemEmail = (item.citizenEmail || item.citizen_email || item.email || '').toLowerCase();
+    const itemCitizen = String(item.citizen || item.citizenId || item.citizen_id || item.userId || '');
+    return (userEmail && itemEmail === userEmail) || (userId && itemCitizen === userId);
+  });
+  const myCount = myUserComplaints.length;
+  const resolvedCount = myUserComplaints.filter(c => c.status === 'Resolved' || c.status === 'Closed').length;
 
   return (
     <div style={{ maxWidth: '850px', margin: '0 auto', paddingBottom: '3rem' }}>
       
+      {/* Top Back Navigation Button */}
+      <div style={{ marginBottom: '1.25rem' }}>
+        <button
+          onClick={() => navigate(-1)}
+          className="btn btn-outline"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.45rem',
+            padding: '0.45rem 0.9rem',
+            borderRadius: '0.5rem',
+            fontSize: '0.875rem',
+            fontWeight: 700,
+            cursor: 'pointer',
+            backgroundColor: '#ffffff',
+            border: '1px solid #cbd5e1',
+            color: '#334155'
+          }}
+        >
+          <ArrowLeft size={16} />
+          <span>Back to Dashboard</span>
+        </button>
+      </div>
+
       {/* Header */}
       <div style={{ marginBottom: '2rem' }}>
         <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a' }}>
@@ -186,6 +226,38 @@ export default function Profile() {
                 Update Password
               </button>
             </div>
+          </div>
+
+          {/* Account Actions / Logout Box */}
+          <div className="card" style={{ padding: '1.75rem', border: '1px solid #fee2e2', backgroundColor: '#fff5f5' }}>
+            <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#991b1b', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <LogOut size={18} color="#dc2626" /> Account Session
+            </h3>
+            <p style={{ color: '#7f1d1d', fontSize: '0.85rem', marginBottom: '1rem' }}>
+              Sign out of your active citizen account session on this device.
+            </p>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="btn btn-danger"
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem',
+                backgroundColor: '#dc2626',
+                color: '#ffffff',
+                border: 'none',
+                padding: '0.65rem 1rem',
+                borderRadius: '0.5rem',
+                fontWeight: 700,
+                cursor: 'pointer'
+              }}
+            >
+              <LogOut size={16} />
+              <span>Logout from Citizen Portal</span>
+            </button>
           </div>
 
         </div>

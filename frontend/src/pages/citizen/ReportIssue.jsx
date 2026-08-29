@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sparkles, MapPin, Camera, CheckCircle2, ArrowRight } from 'lucide-react';
+import { Sparkles, MapPin, Camera, CheckCircle2, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useComplaints } from '../../context/ComplaintContext';
 import { useAuth } from '../../context/AuthContext';
 import { uploadFileApi } from '../../services/complaintService';
@@ -258,13 +258,35 @@ export default function ReportIssue() {
   return (
     <div style={{ maxWidth: '850px', margin: '0 auto', paddingBottom: '3rem' }}>
       
+      {/* Back Button */}
+      <div style={{ marginBottom: '1.25rem' }}>
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          className="btn btn-outline"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.45rem',
+            padding: '0.45rem 0.9rem',
+            borderRadius: '0.5rem',
+            fontSize: '0.875rem',
+            fontWeight: 700,
+            cursor: 'pointer',
+            backgroundColor: '#ffffff',
+            border: '1px solid #cbd5e1',
+            color: '#334155'
+          }}
+        >
+          <ArrowLeft size={16} />
+          <span>Back to Dashboard</span>
+        </button>
+      </div>
+
       {/* Header */}
       <div style={{ marginBottom: '2rem' }}>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', backgroundColor: '#e0f2fe', color: '#0F4C81', padding: '0.3rem 0.8rem', borderRadius: '9999px', fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.5rem' }}>
-          <Sparkles size={14} color="#0F4C81" /> 🎙️ Smart Voice-to-Text & High-Precision GPS Engine
-        </div>
         <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a' }}>
-          Report a Civic Issue
+          Report a New Civic Issue
         </h1>
         <p style={{ color: '#64748b', fontSize: '0.95rem' }}>
           Describe the complaint and auto-detect your exact location using Google Maps Geocoding & High-Accuracy GPS.

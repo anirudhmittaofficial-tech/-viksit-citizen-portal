@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Search, Download, Filter, Eye, Plus, ArrowUpDown, FileText } from 'lucide-react';
+import { Search, Download, Filter, Eye, Plus, ArrowUpDown, FileText, ArrowLeft } from 'lucide-react';
 import { useComplaints } from '../../context/ComplaintContext';
 import { useAuth } from '../../context/AuthContext';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import StatusBadge from '../../components/common/StatusBadge';
 import ComplaintDetail from './ComplaintDetail';
 import EmptyState from '../../components/common/EmptyState';
@@ -11,6 +11,7 @@ import SkeletonLoader from '../../components/common/SkeletonLoader';
 export default function MyComplaints() {
   const { complaints, loading, addComment } = useComplaints();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [categoryFilter, setCategoryFilter] = useState('All');
@@ -64,6 +65,30 @@ export default function MyComplaints() {
   return (
     <div style={{ paddingBottom: '3rem' }}>
       
+      {/* Back Button */}
+      <div style={{ marginBottom: '1.25rem' }}>
+        <button
+          onClick={() => navigate(-1)}
+          className="btn btn-outline"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.45rem',
+            padding: '0.45rem 0.9rem',
+            borderRadius: '0.5rem',
+            fontSize: '0.875rem',
+            fontWeight: 700,
+            cursor: 'pointer',
+            backgroundColor: '#ffffff',
+            border: '1px solid #cbd5e1',
+            color: '#334155'
+          }}
+        >
+          <ArrowLeft size={16} />
+          <span>Back to Dashboard</span>
+        </button>
+      </div>
+
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem' }}>
         <div>

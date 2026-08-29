@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NavLink, useNavigate, Outlet, Link } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation, Outlet, Link } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   PlusCircle, 
@@ -11,7 +11,8 @@ import {
   Menu,
   X,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  ArrowLeft
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useComplaints } from '../../context/ComplaintContext';
