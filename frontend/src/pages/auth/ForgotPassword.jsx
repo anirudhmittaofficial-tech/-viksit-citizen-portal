@@ -6,18 +6,20 @@ import { forgotPasswordApi } from '../../services/authService';
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setMessage('');
+    setError('');
     
     try {
       const data = await forgotPasswordApi(email);
-      setMessage(data.message || 'If an account exists with this email, a password reset link has been sent.');
-    } catch (error) {
-      setMessage(error.message || 'Something went wrong. Please try again.');
+      setMessage(data.message || 'If an account exists with this email, a password reset link has been sent. Please check your inbox.');
+    } catch (err) {
+      setError(err.message || 'Unable to send reset link. Please verify your connection.');
     } finally {
       setLoading(false);
     }
@@ -102,6 +104,12 @@ export default function ForgotPassword() {
           {message && (
             <div style={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', color: '#166534', padding: '0.75rem 1rem', borderRadius: '0.5rem', fontSize: '0.875rem', marginBottom: '1.5rem', fontWeight: 600 }}>
               {message}
+            </div>
+          )}
+
+          {error && (
+            <div style={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#991b1b', padding: '0.75rem 1rem', borderRadius: '0.5rem', fontSize: '0.875rem', marginBottom: '1.5rem', fontWeight: 600 }}>
+              {error}
             </div>
           )}
 
