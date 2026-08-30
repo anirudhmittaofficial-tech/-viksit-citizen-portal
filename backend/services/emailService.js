@@ -1,14 +1,23 @@
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-let resend;
+// Create reusable transporter using Gmail
+let transporter;
 
-// Initialize Resend conditionally to avoid crashing if key is missing
-if (process.env.RESEND_API_KEY) {
-  resend = new Resend(process.env.RESEND_API_KEY);
-}
+const getTransporter = () => {
+  if (!transporter) {
+    transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
+  }
+  return transporter;
+};
 
 /**
  * Sends a password reset email to the user.
@@ -16,16 +25,17 @@ if (process.env.RESEND_API_KEY) {
  * @param {string} resetUrl - The secure reset URL containing the raw token
  */
 export const sendPasswordResetEmail = async (to, resetUrl) => {
-  if (!resend) {
-    console.error('RESEND_API_KEY is not configured in environment variables. Email will not be sent.');
+  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    console.error('SMTP credentials are not configured in environment variables. Email will not be sent.');
     return;
   }
 
   try {
-    const { data, error } = await resend.emails.send({
-      from: process.env.EMAIL_FROM || 'onboarding@resend.dev',
+    const client = getTransporter();
+    const info = await client.sendMail({
+      from: process.env.EMAIL_FROM || process.env.SMTP_USER,
       to,
-      subject: 'Password Reset Request',
+      subject: 'Password Reset Request - VIKSIT',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
           <h2 style="color: #333; text-align: center;">Smart Civic Platform</h2>
@@ -41,14 +51,10 @@ export const sendPasswordResetEmail = async (to, resetUrl) => {
       `,
     });
 
-    if (error) {
-      console.error('Resend Error sending email:', error);
-      throw error;
-    }
-
-    return data;
+    console.log('Password reset email sent successfully:', info.messageId);
+    return info;
   } catch (error) {
-    console.error('Exception in sendPasswordResetEmail:', error);
+    console.error('Nodemailer error in sendPasswordResetEmail:', error);
     throw error;
   }
 };
@@ -59,14 +65,15 @@ export const sendPasswordResetEmail = async (to, resetUrl) => {
  * @param {string} name - The user's name
  */
 export const sendWelcomeEmail = async (to, name) => {
-  if (!resend) {
-    console.error('RESEND_API_KEY is not configured in environment variables. Email will not be sent.');
+  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    console.error('SMTP credentials are not configured in environment variables. Email will not be sent.');
     return;
   }
 
   try {
-    const { data, error } = await resend.emails.send({
-      from: process.env.EMAIL_FROM || 'onboarding@resend.dev',
+    const client = getTransporter();
+    const info = await client.sendMail({
+      from: process.env.EMAIL_FROM || process.env.SMTP_USER,
       to,
       subject: 'Welcome to Smart Civic Resolution Platform!',
       html: `
@@ -84,14 +91,10 @@ export const sendWelcomeEmail = async (to, name) => {
       `,
     });
 
-    if (error) {
-      console.error('Resend Error sending welcome email:', error);
-      throw error;
-    }
-
-    return data;
+    console.log('Welcome email sent successfully:', info.messageId);
+    return info;
   } catch (error) {
-    console.error('Exception in sendWelcomeEmail:', error);
+    console.error('Nodemailer error in sendWelcomeEmail:', error);
     throw error;
   }
 };
