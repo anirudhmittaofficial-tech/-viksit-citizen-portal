@@ -24,7 +24,7 @@ const sendViaBrevoApi = async ({ to, subject, html }) => {
     body: JSON.stringify({
       sender: {
         name: 'Viksit Support',
-        email: process.env.SMTP_USER || 'neelasaikumar2020@gmail.com'
+        email: process.env.BREVO_SENDER_EMAIL || 'myistorage2024@gmail.com'
       },
       to: [{ email: to }],
       subject,
