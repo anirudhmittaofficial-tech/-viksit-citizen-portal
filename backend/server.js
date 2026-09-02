@@ -13,6 +13,7 @@ import authRoutes from './routes/authRoutes.js';
 import complaintRoutes from './routes/complaintRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
+import speechRoutes from './routes/speechRoutes.js';
 
 // Middleware Imports
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
@@ -107,6 +108,9 @@ app.use('/notifications', notificationRoutes);
 
 app.use('/api/upload', uploadRoutes);
 app.use('/upload', uploadRoutes);
+
+app.use('/api/speech', speechRoutes);
+app.use('/speech', speechRoutes);
 
 // Error Handling Middlewares
 app.use(notFound);

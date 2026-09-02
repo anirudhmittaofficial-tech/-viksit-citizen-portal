@@ -96,12 +96,6 @@ export default function ReportIssue() {
     setLocationData(loc);
   };
 
-  const handleAutoProcessedSpeech = (processed) => {
-    if (processed.category) {
-      setFormData(prev => ({ ...prev, category: processed.category }));
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -117,6 +111,11 @@ export default function ReportIssue() {
 
     if (!formData.description || !formData.description.trim()) {
       alert('Please provide a description of the issue.');
+      return;
+    }
+
+    if (!formData.imageUrl && !imagePreview && !imageFile) {
+      alert('Evidence photo is mandatory. Please capture a live photo or upload an image of the issue.');
       return;
     }
 
@@ -142,7 +141,12 @@ export default function ReportIssue() {
 
     setSubmitting(true);
     try {
-      const finalImageUrl = formData.imageUrl || imagePreview || 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=600&q=80';
+      const finalImageUrl = formData.imageUrl || imagePreview || '';
+      if (!finalImageUrl) {
+        alert('Please attach or upload a valid evidence photograph.');
+        setSubmitting(false);
+        return;
+      }
       const latNum = Number(locationData.latitude);
       const lngNum = Number(locationData.longitude);
       const coordsStr = locationData.coordinates || `${latNum.toFixed(5)}° N, ${lngNum.toFixed(5)}° E`;
@@ -302,7 +306,6 @@ export default function ReportIssue() {
           placeholder="e.g. Deep Pothole on M.G. Road (or click 🎙️ to speak)"
           value={formData.title}
           onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-          onAutoProcessed={handleAutoProcessedSpeech}
         />
 
         {/* Category Selection */}
@@ -330,12 +333,12 @@ export default function ReportIssue() {
           placeholder="Describe the issue in detail or click 🎙️ Voice to Text to speak in Hindi or English..."
           value={formData.description}
           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-          onAutoProcessed={handleAutoProcessedSpeech}
         />
 
         {/* Image / Photo Attachment */}
         <ImageCaptureInput
-          label="Upload Evidence (Image, PDF, Word) or Take Photo"
+          label="Upload Evidence Photo or Take Live Camera Snapshot *"
+          required={true}
           imagePreview={imagePreview}
           uploading={uploadingImage}
           imageVerification={formData.imageVerification}

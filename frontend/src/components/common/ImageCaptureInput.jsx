@@ -8,7 +8,8 @@ export default function ImageCaptureInput({
   uploadError,
   onImageSelected,
   onClearImage,
-  label = 'Upload Photo / Evidence Image'
+  label = 'Upload Photo / Evidence Image',
+  required = false
 }) {
   const [showCameraModal, setShowCameraModal] = useState(false);
   const [stream, setStream] = useState(null);
@@ -152,7 +153,7 @@ export default function ImageCaptureInput({
     <div style={{ width: '100%' }}>
       {label && (
         <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: 700, color: '#1e293b', marginBottom: '0.6rem' }}>
-          {label}
+          {label} {required && !label.includes('*') && <span style={{ color: '#ef4444' }}>*</span>}
         </label>
       )}
 

@@ -166,7 +166,7 @@ export function ComplaintProvider({ children }) {
         { status: 'Submitted', date: formattedDate, note: 'Complaint logged successfully by citizen.' }
       ],
       comments: [],
-      imageUrl: newIssueData.imageUrl || 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=600&q=80'
+      imageUrl: newIssueData.imageUrl || ''
     };
 
     const updatedList = [newIssue, ...complaints];

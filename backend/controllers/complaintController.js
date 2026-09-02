@@ -92,6 +92,8 @@ export const createComplaint = async (req, res, next) => {
       !title ||
       !category ||
       !description ||
+      !imageUrl ||
+      !String(imageUrl).trim() ||
       !addressStr ||
       rawLat === undefined ||
       rawLat === null ||
@@ -102,7 +104,7 @@ export const createComplaint = async (req, res, next) => {
     ) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide all required fields: title, category, description, location address, latitude, and longitude.',
+        message: 'Please provide all required fields: title, category, description, evidence photo, location address, latitude, and longitude.',
         error: 'Missing required parameters'
       });
     }
@@ -151,7 +153,7 @@ export const createComplaint = async (req, res, next) => {
       longitude: parsedLng,
       severity: severity || 'Medium',
       status: 'Submitted',
-      imageUrl: imageUrl || 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=600&q=80',
+      imageUrl: imageUrl.trim(),
       aiVerification: aiVerification || null,
       citizen: req.user.id,
       citizenName: req.user.name,

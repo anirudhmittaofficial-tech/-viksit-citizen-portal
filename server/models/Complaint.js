@@ -91,7 +91,7 @@ const complaintSchema = new mongoose.Schema(
     },
     imageUrl: {
       type: String,
-      default: 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=600&q=80'
+      default: ''
     },
     resolutionImageUrl: {
       type: String,
